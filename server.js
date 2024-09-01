@@ -1,7 +1,6 @@
 const express = require('express');
 import routes from './routes/index';
 
-
 const app = express();
 
 app.use('/', routes);
