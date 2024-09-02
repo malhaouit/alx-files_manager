@@ -6,18 +6,17 @@ class RedisClient {
 
     this.isConnected = false;
 
-    this.connectionPromise = new Promise((resolve) => {
-      this.client.on('connect', () => {
-        this.isConnected = true;
-        resolve(true);
-      });
+    this.client.on('ready', () => {
+      this.isConnected = true;
     });
 
-    this.client.on('error', (err) => console.error('Redis Client Error', err));
+    this.client.on('error', (err) => {
+      console.error('Redis Client Error:', err);
+      this.isConnected = false; // Ensure it sets isConnected to false on error
+    });
   }
 
-  async isAlive() {
-    await this.connectionPromise;
+  isAlive() {
     return this.isConnected;
   }
 
