@@ -45,7 +45,7 @@ class FilesController {
     if (type === 'folder') {
       const result = await dbClient.db.collection('files').insertOne(fileDoc);
       return res.status(201).json({
-        id: result.insertedId,
+        id: result.insertedId.toString(),
         userId,
         name,
         type,
@@ -65,7 +65,7 @@ class FilesController {
     const result = await dbClient.db.collection('files').insertOne(fileDoc);
 
     return res.status(201).json({
-      id: result.insertedId,
+      id: result.insertedId.toString(),
       userId,
       name,
       type,
@@ -93,7 +93,17 @@ class FilesController {
         return res.status(404).json({ error: 'Not found' });
       }
 
-      return res.status(200).json(file);
+      // Transform the file document to match the required output
+      const fileData = {
+        id: file._id.toString(), // Convert _id to id
+        userId: file.userId.toString(),
+        name: file.name,
+        type: file.type,
+        isPublic: file.isPublic,
+        parentId: file.parentId,
+      };
+
+      return res.status(200).json(fileData);
     } catch (error) {
       return res.status(404).json({ error: 'Not found' });
     }
@@ -123,7 +133,17 @@ class FilesController {
         .limit(20)
         .toArray();
 
-      return res.status(200).json(files);
+      // Transform files array to match the required output
+      const transformedFiles = files.map((file) => ({
+        id: file._id.toString(), // Convert _id to id
+        userId: file.userId.toString(),
+        name: file.name,
+        type: file.type,
+        isPublic: file.isPublic,
+        parentId: file.parentId,
+      }));
+
+      return res.status(200).json(transformedFiles);
     } catch (error) {
       return res.status(500).json({ error: 'Error retrieving files' });
     }
